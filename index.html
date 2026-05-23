@@ -209,6 +209,9 @@ function sendBoxes() {
     boxes.forEach(b => guess += b.value);
 
     checkGuess(guess);
+
+    // Pulisce le caselle dopo ogni tentativo
+    boxes.forEach(b => b.value = "");
 }
 
 function checkGuess(guess) {
@@ -260,7 +263,9 @@ function checkGuess(guess) {
     if (green === 5) {
         document.getElementById("results").innerHTML += `
             <h2>Hai indovinato! 🎉</h2>
-            <div style="font-size:50px; margin-top:10px;">🏆</div>
+            <div style="margin-top:10px;">
+                <img src="fireworks.jpg" style="width:200px; border-radius:10px;">
+            </div>
             <p style="opacity:0.7;">Grande ${player}!</p>
         `;
 
@@ -285,8 +290,10 @@ function checkGuess(guess) {
         document.getElementById("results").innerHTML += `
             <h2>Hai finito i tentativi 😵</h2>
             <p>La serie era: <strong>${secret}</strong></p>
-            <div style="font-size:50px; margin-top:10px;">🙈😂</div>
-            <p style="opacity:0.7;">Ritenta ${player}, sei stato coraggioso!</p>
+            <div style="margin-top:10px;">
+                <img src="monkey.jpg" style="width:160px; border-radius:10px;">
+            </div>
+            <p style="opacity:0.7;">Ritenta ${player}, la scimmia ti guarda così…</p>
         `;
     }
 }
@@ -299,4 +306,3 @@ loadRanking();
 </p>
 
 </body>
-</html>
