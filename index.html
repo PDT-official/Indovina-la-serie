@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Indovina la Serie</title>
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -17,31 +18,41 @@
         padding: 20px;
         border-radius: 10px;
         width: 90%;
-        max-width: 500px;
+        max-width: 550px;
         margin: auto;
         margin-top: 20px;
     }
 
-    input {
+    select, button {
         padding: 10px;
         font-size: 18px;
-        width: 200px;
-        text-align: center;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: none;
     }
 
     button {
-        padding: 10px 20px;
-        font-size: 18px;
-        margin-top: 10px;
-        cursor: pointer;
-        border: none;
-        border-radius: 8px;
         background: #4caf50;
         color: white;
+        cursor: pointer;
+    }
+
+    #inputBoxes {
+        margin-top: 20px;
+    }
+
+    .digit {
+        width: 45px;
+        height: 45px;
+        font-size: 26px;
+        text-align: center;
+        margin: 5px;
+        border-radius: 6px;
+        border: none;
     }
 
     .attempt {
-        margin-top: 10px;
+        margin-top: 12px;
         font-size: 22px;
     }
 </style>
@@ -55,16 +66,23 @@
     <h2>Scegli lo stile dei simboli</h2>
 
     <select id="signalStyle">
-        <option value="classic">Classico — 🟢 giusto / 🔴 quasi</option>
-        <option value="angeldevil">Angioletto & Diavoletto — 😇 giusto / 😈 quasi</option>
-        <option value="soft">Soft (cuori) — 💚 giusto / ❤️ quasi</option>
-        <option value="emoji">Emoji Power — ⭐ giusto / 🔥 quasi</option>
-        <option value="dark">Dark Mode — 💀 giusto / ☠️ quasi</option>
-        <option value="minimal">Minimal — ✔️ giusto / ❌ quasi</option>
-        <option value="geometric">Geometrico — 🟩 giusto / 🟥 quasi</option>
-        <option value="mind">Mind Game — 🧠 giusto / ⚠️ quasi</option>
-        <option value="cartoon">Cartoon — 🌟 giusto / 💢 quasi</option>
-        <option value="puzzle">Puzzle Mode — 🧩 giusto / 🔻 quasi</option>
+        <option value="classic">Classico — 🟢 numero giusto in posizione giusta / 🔴 numero giusto in posizione sbagliata</option>
+        <option value="angeldevil">Angioletto & Diavoletto — 😇 giusto in posizione giusta / 😈 giusto in posizione sbagliata</option>
+        <option value="soft">Soft (cuori) — 💚 giusto in posizione giusta / ❤️ giusto in posizione sbagliata</option>
+        <option value="emoji">Emoji Power — ⭐ giusto in posizione giusta / 🔥 giusto in posizione sbagliata</option>
+        <option value="dark">Dark Mode — 💀 giusto in posizione giusta / ☠️ giusto in posizione sbagliata</option>
+        <option value="minimal">Minimal — ✔️ giusto in posizione giusta / ❌ giusto in posizione sbagliata</option>
+        <option value="geometric">Geometrico — 🟩 giusto in posizione giusta / 🟥 giusto in posizione sbagliata</option>
+        <option value="mind">Mind Game — 🧠 giusto in posizione giusta / ⚠️ giusto in posizione sbagliata</option>
+        <option value="cartoon">Cartoon — 🌟 giusto in posizione giusta / 💢 giusto in posizione sbagliata</option>
+        <option value="puzzle">Puzzle Mode — 🧩 giusto in posizione giusta / 🔻 giusto in posizione sbagliata</option>
+    </select>
+
+    <h2>Scegli il livello</h2>
+    <select id="gameLevel">
+        <option value="rookie">Rookie — 10 tentativi</option>
+        <option value="semipro">Semi‑Pro — 8 tentativi</option>
+        <option value="pro">Pro — 6 tentativi</option>
     </select>
 
     <button onclick="startGame()">Inizia</button>
@@ -72,10 +90,17 @@
 
 <!-- AREA DI GIOCO -->
 <div id="gameArea" style="display:none;">
-    <h2>Inserisci una sequenza di 5 numeri</h2>
+    <h2>Inserisci la sequenza di 5 numeri</h2>
 
-    <input type="text" id="guess" maxlength="5" placeholder="Es: 12345">
-    <button onclick="checkGuess()">Invia</button>
+    <div id="inputBoxes">
+        <input class="digit" maxlength="1">
+        <input class="digit" maxlength="1">
+        <input class="digit" maxlength="1">
+        <input class="digit" maxlength="1">
+        <input class="digit" maxlength="1">
+    </div>
+
+    <button onclick="sendBoxes()">Invia</button>
 
     <div id="results"></div>
 </div>
@@ -83,8 +108,10 @@
 <script>
 let secret = "";
 let symbols = { green: "🟢", red: "🔴" };
+let attempts = 0;
+let maxAttempts = 8;
 
-// GENERA NUMERI CASUALI
+// GENERA NUMERO SEGRETO
 function generateSecret() {
     secret = "";
     for (let i = 0; i < 5; i++) {
@@ -92,10 +119,12 @@ function generateSecret() {
     }
 }
 
-// AVVIO GIOCO + SCELTA SIMBOLI
+// AVVIO GIOCO
 function startGame() {
     const style = document.getElementById("signalStyle").value;
+    const level = document.getElementById("gameLevel").value;
 
+    // IMPOSTA SIMBOLI
     switch(style) {
         case "classic": symbols.green = "🟢"; symbols.red = "🔴"; break;
         case "angeldevil": symbols.green = "😇"; symbols.red = "😈"; break;
@@ -109,20 +138,44 @@ function startGame() {
         case "puzzle": symbols.green = "🧩"; symbols.red = "🔻"; break;
     }
 
+    // IMPOSTA LIVELLO
+    if (level === "rookie") maxAttempts = 10;
+    if (level === "semipro") maxAttempts = 8;
+    if (level === "pro") maxAttempts = 6;
+
+    attempts = 0;
+    document.getElementById("results").innerHTML = "";
+
     document.getElementById("styleSelector").style.display = "none";
     document.getElementById("gameArea").style.display = "block";
 
     generateSecret();
 }
 
-// CONTROLLO TENTATIVO
-function checkGuess() {
-    const guess = document.getElementById("guess").value;
+// RACCOGLIE LE 5 CASELLE
+function sendBoxes() {
+    const boxes = document.querySelectorAll(".digit");
+    let guess = "";
 
-    if (guess.length !== 5 || isNaN(guess)) {
-        alert("Inserisci 5 numeri!");
+    boxes.forEach(b => guess += b.value);
+
+    checkGuess(guess);
+}
+
+// CONTROLLO TENTATIVO
+function checkGuess(guess) {
+
+    if (attempts >= maxAttempts) {
+        alert("Hai già usato tutti i tentativi!");
         return;
     }
+
+    if (guess.length !== 5 || isNaN(guess)) {
+        alert("Inserisci 5 numeri validi!");
+        return;
+    }
+
+    attempts++;
 
     let green = 0;
     let red = 0;
@@ -151,15 +204,21 @@ function checkGuess() {
 
     document.getElementById("results").innerHTML += `
         <div class="attempt">
-            <strong>${guess}</strong> → 
+            <strong>${guess}</strong> →
             ${symbols.green.repeat(green)}
             ${symbols.red.repeat(red)}
+            <span style="font-size:14px; opacity:0.7;"> (${attempts}/${maxAttempts})</span>
         </div>
     `;
 
     if (green === 5) {
+        document.getElementById("results").innerHTML += `<h2>Hai indovinato! 🎉</h2>`;
+        return;
+    }
+
+    if (attempts >= maxAttempts) {
         document.getElementById("results").innerHTML += `
-            <h2>Hai indovinato! 🎉</h2>
+            <h2>Hai finito i tentativi 😵<br>La serie era: ${secret}</h2>
         `;
     }
 }
