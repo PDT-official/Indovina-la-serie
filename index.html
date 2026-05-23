@@ -92,6 +92,20 @@
 
 <h1>Indovina la Serie</h1>
 
+<p style="max-width:650px;margin:10px auto 0;font-size:15px;line-height:1.4;">
+Il computer genera una sequenza segreta di 5 cifre (da 0 a 9).  
+Tu provi a indovinarla: ad ogni tentativo ricevi dei simboli che indicano:
+<br><strong>• numero giusto in posizione giusta</strong><br>
+<strong>• numero giusto in posizione sbagliata</strong><br>
+Hai un numero limitato di tentativi in base al livello scelto.
+</p>
+
+<!-- POSTILLA IMPORTANTE -->
+<p style="max-width:650px;margin:5px auto 0;font-size:13px;opacity:0.7;">
+Nota: la sequenza segreta <strong>non contiene numeri ripetuti</strong>.  
+Ogni tentativo è valutato indipendentemente.
+</p>
+
 <!-- MENU INIZIALE -->
 <div id="styleSelector">
 
@@ -172,10 +186,15 @@ function updateRankingView() {
     }
 }
 
+/* ------------------ SEQUENZA SENZA DOPPIONI ------------------ */
 function generateSecret() {
+    let digits = ["0","1","2","3","4","5","6","7","8","9"];
     secret = "";
+
     for (let i = 0; i < 5; i++) {
-        secret += Math.floor(Math.random() * 10);
+        let index = Math.floor(Math.random() * digits.length);
+        secret += digits[index];
+        digits.splice(index, 1); // rimuove il numero usato
     }
 }
 
