@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Indovina i 5 Numeri</title>
+<style>
+    body {
+        background: #0d0d0d;
+        color: #eee;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 40px;
+    }
 
+    h1 {
+        color: #00eaff;
+        text-shadow: 0 0 10px #00eaff;
+    }
+
+    .row {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    input {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+        text-align: center;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 18px;
+        background: #00eaff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: #000;
+        font-weight: bold;
+        box-shadow: 0 0 10px #00eaff;
+    }
+
+    .result {
+        display: flex;
+        gap: 6px;
+        margin-left: 15px;
+    }
+
+    .dot-green {
+        width: 15px;
+        height: 15px;
+        background: #00ff55;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #00ff55;
+    }
+
+    .dot-red {
+        width: 15px;
+        height: 15px;
+        background: #ff0033;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #ff0033;
+    }
+
+    #log {
+        margin-top: 30px;
+        width: 300px;
+    }
+
+    .attempt {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Indovina i 5 Numeri</h1>
+
+<div class="row" id="inputs">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+</div>
+
+<button onclick="play()">Invia Tentativo</button>
+
+<div id="log"></div>
+
+<script>
+let secret = [];
+let attempts = 0;
+const maxAttempts = 8;
+
+// Genera i 5 numeri segreti
+function generateSecret() {
+    secret = [];
+    for (let i = 0; i < 5; i++) {
+        secret.push(Math.floor(Math.random() * 10));
+    }
+    console.log("DEBUG - Segreto:", secret);
+}
+generateSecret();
+
+function play() {
+    if (attempts >= maxAttempts) return;
+
+    const inputs = [...document.querySelectorAll("#inputs input")];
+    const guess = inputs.map(i => parseInt(i.value));
+
+    if (guess.some(isNaN)) {
+        alert("Inserisci tutti i numeri!");
+        return;
+    }
+
+    attempts++;
+
+    // Calcolo pallini
+    let green = 0;
+    let red = 0;
+
+    let secretCopy = [...secret];
+    let guessCopy = [...guess];
+
+    // Verde: numero + posizione giusta
+    for (let i = 0; i < 5; i++) {
+        if (guessCopy[i] === secretCopy[i]) {
+            green++;
+            secretCopy[i] = guessCopy[i] = null;
+        }
+    }
+
+    // Rosso: numero giusto ma posizione sbagliata
+    for (let i = 0; i < 5; i++) {
+        if (guessCopy[i] !== null) {
+            let index = secretCopy.indexOf(guessCopy[i]);
+            if (index !== -1) {
+                red++;
+                secretCopy[index] = null;
+            }
+        }
+    }
+
+    // Mostra risultato
+    const log = document.getElementById("log");
+    const row = document.createElement("div");
+    row.className = "attempt";
+
+    row.innerHTML = `
+        <span>${guess.join(" ")}</span>
+        <span class="result">
+            ${"<div class='dot-green'></div>".repeat(green)}
+            ${"<div class='dot-red'></div>".repeat(red)}
+        </span>
+    `;
+
+    log.appendChild(row);
+
+    // Vittoria
+    if (green === 5) {
+        alert("Hai indovinato! 🎉");
+    }
+
+    // Fine tentativi
+    if (attempts === maxAttempts && green !== 5) {
+        alert("Tentativi finiti! La sequenza era: " + secret.join(" "));
+    }
+
+    // Pulisci input
+    inputs.forEach(i => i.value = "");
+}
+</script>
+
+</body>
+</html>
