@@ -1,186 +1,167 @@
 <!DOCTYPE html>
-<!-- trigger build -->
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Indovina i 5 Numeri</title>
+<title>Indovina la Serie</title>
 <style>
     body {
-        background: #0d0d0d;
-        color: #eee;
         font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 40px;
+        background: #111;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
     }
 
-    h1 {
-        color: #00eaff;
-        text-shadow: 0 0 10px #00eaff;
-    }
-
-    .row {
-        display: flex;
-        gap: 10px;
-        margin: 10px 0;
+    #styleSelector, #gameArea {
+        background: #222;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        margin: auto;
+        margin-top: 20px;
     }
 
     input {
-        width: 40px;
-        height: 40px;
-        font-size: 22px;
+        padding: 10px;
+        font-size: 18px;
+        width: 200px;
         text-align: center;
-        border-radius: 6px;
-        border: none;
-        outline: none;
     }
 
     button {
-        margin-top: 20px;
         padding: 10px 20px;
         font-size: 18px;
-        background: #00eaff;
-        border: none;
-        border-radius: 6px;
+        margin-top: 10px;
         cursor: pointer;
-        color: #000;
-        font-weight: bold;
-        box-shadow: 0 0 10px #00eaff;
-    }
-
-    .result {
-        display: flex;
-        gap: 6px;
-        margin-left: 15px;
-    }
-
-    .dot-green {
-        width: 15px;
-        height: 15px;
-        background: #00ff55;
-        border-radius: 50%;
-        box-shadow: 0 0 6px #00ff55;
-    }
-
-    .dot-red {
-        width: 15px;
-        height: 15px;
-        background: #ff0033;
-        border-radius: 50%;
-        box-shadow: 0 0 6px #ff0033;
-    }
-
-    #log {
-        margin-top: 30px;
-        width: 300px;
+        border: none;
+        border-radius: 8px;
+        background: #4caf50;
+        color: white;
     }
 
     .attempt {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 18px;
+        margin-top: 10px;
+        font-size: 22px;
     }
 </style>
 </head>
 <body>
 
-<h1>Indovina i 5 Numeri</h1>
+<h1>Indovina la Serie</h1>
 
-<div class="row" id="inputs">
-    <input maxlength="1">
-    <input maxlength="1">
-    <input maxlength="1">
-    <input maxlength="1">
-    <input maxlength="1">
+<!-- MENU INIZIALE -->
+<div id="styleSelector">
+    <h2>Scegli lo stile dei simboli</h2>
+
+    <select id="signalStyle">
+        <option value="classic">Classico — 🟢 giusto / 🔴 quasi</option>
+        <option value="angeldevil">Angioletto & Diavoletto — 😇 giusto / 😈 quasi</option>
+        <option value="soft">Soft (cuori) — 💚 giusto / ❤️ quasi</option>
+        <option value="emoji">Emoji Power — ⭐ giusto / 🔥 quasi</option>
+        <option value="dark">Dark Mode — 💀 giusto / ☠️ quasi</option>
+        <option value="minimal">Minimal — ✔️ giusto / ❌ quasi</option>
+        <option value="geometric">Geometrico — 🟩 giusto / 🟥 quasi</option>
+        <option value="mind">Mind Game — 🧠 giusto / ⚠️ quasi</option>
+        <option value="cartoon">Cartoon — 🌟 giusto / 💢 quasi</option>
+        <option value="puzzle">Puzzle Mode — 🧩 giusto / 🔻 quasi</option>
+    </select>
+
+    <button onclick="startGame()">Inizia</button>
 </div>
 
-<button onclick="play()">Invia Tentativo</button>
+<!-- AREA DI GIOCO -->
+<div id="gameArea" style="display:none;">
+    <h2>Inserisci una sequenza di 5 numeri</h2>
 
-<div id="log"></div>
+    <input type="text" id="guess" maxlength="5" placeholder="Es: 12345">
+    <button onclick="checkGuess()">Invia</button>
+
+    <div id="results"></div>
+</div>
 
 <script>
-let secret = [];
-let attempts = 0;
-const maxAttempts = 8;
+let secret = "";
+let symbols = { green: "🟢", red: "🔴" };
 
-// Genera i 5 numeri segreti
+// GENERA NUMERI CASUALI
 function generateSecret() {
-    secret = [];
+    secret = "";
     for (let i = 0; i < 5; i++) {
-        secret.push(Math.floor(Math.random() * 10));
+        secret += Math.floor(Math.random() * 10);
     }
-    console.log("DEBUG - Segreto:", secret);
 }
-generateSecret();
 
-function play() {
-    if (attempts >= maxAttempts) return;
+// AVVIO GIOCO + SCELTA SIMBOLI
+function startGame() {
+    const style = document.getElementById("signalStyle").value;
 
-    const inputs = [...document.querySelectorAll("#inputs input")];
-    const guess = inputs.map(i => parseInt(i.value));
+    switch(style) {
+        case "classic": symbols.green = "🟢"; symbols.red = "🔴"; break;
+        case "angeldevil": symbols.green = "😇"; symbols.red = "😈"; break;
+        case "soft": symbols.green = "💚"; symbols.red = "❤️"; break;
+        case "emoji": symbols.green = "⭐"; symbols.red = "🔥"; break;
+        case "dark": symbols.green = "💀"; symbols.red = "☠️"; break;
+        case "minimal": symbols.green = "✔️"; symbols.red = "❌"; break;
+        case "geometric": symbols.green = "🟩"; symbols.red = "🟥"; break;
+        case "mind": symbols.green = "🧠"; symbols.red = "⚠️"; break;
+        case "cartoon": symbols.green = "🌟"; symbols.red = "💢"; break;
+        case "puzzle": symbols.green = "🧩"; symbols.red = "🔻"; break;
+    }
 
-    if (guess.some(isNaN)) {
-        alert("Inserisci tutti i numeri!");
+    document.getElementById("styleSelector").style.display = "none";
+    document.getElementById("gameArea").style.display = "block";
+
+    generateSecret();
+}
+
+// CONTROLLO TENTATIVO
+function checkGuess() {
+    const guess = document.getElementById("guess").value;
+
+    if (guess.length !== 5 || isNaN(guess)) {
+        alert("Inserisci 5 numeri!");
         return;
     }
 
-    attempts++;
-
-    // Calcolo pallini
     let green = 0;
     let red = 0;
 
-    let secretCopy = [...secret];
-    let guessCopy = [...guess];
+    let secretArr = secret.split("");
+    let guessArr = guess.split("");
 
-    // Verde: numero + posizione giusta
+    // GIUSTO-GIUSTO
     for (let i = 0; i < 5; i++) {
-        if (guessCopy[i] === secretCopy[i]) {
+        if (guessArr[i] === secretArr[i]) {
             green++;
-            secretCopy[i] = guessCopy[i] = null;
+            secretArr[i] = guessArr[i] = null;
         }
     }
 
-    // Rosso: numero giusto ma posizione sbagliata
+    // GIUSTO-SBAGLIATO
     for (let i = 0; i < 5; i++) {
-        if (guessCopy[i] !== null) {
-            let index = secretCopy.indexOf(guessCopy[i]);
+        if (guessArr[i] !== null) {
+            let index = secretArr.indexOf(guessArr[i]);
             if (index !== -1) {
                 red++;
-                secretCopy[index] = null;
+                secretArr[index] = null;
             }
         }
     }
 
-    // Mostra risultato
-    const log = document.getElementById("log");
-    const row = document.createElement("div");
-    row.className = "attempt";
-
-    row.innerHTML = `
-        <span>${guess.join(" ")}</span>
-        <span class="result">
-            ${"<div class='dot-green'></div>".repeat(green)}
-            ${"<div class='dot-red'></div>".repeat(red)}
-        </span>
+    document.getElementById("results").innerHTML += `
+        <div class="attempt">
+            <strong>${guess}</strong> → 
+            ${symbols.green.repeat(green)}
+            ${symbols.red.repeat(red)}
+        </div>
     `;
 
-    log.appendChild(row);
-
-    // Vittoria
     if (green === 5) {
-        alert("Hai indovinato! 🎉");
+        document.getElementById("results").innerHTML += `
+            <h2>Hai indovinato! 🎉</h2>
+        `;
     }
-
-    // Fine tentativi
-    if (attempts === maxAttempts && green !== 5) {
-        alert("Tentativi finiti! La sequenza era: " + secret.join(" "));
-    }
-
-    // Pulisci input
-    inputs.forEach(i => i.value = "");
 }
 </script>
 
