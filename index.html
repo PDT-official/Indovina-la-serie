@@ -23,12 +23,18 @@
         margin-top: 20px;
     }
 
-    select, button {
+    #styleSelector h2 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    select, button, input[type="text"] {
         padding: 10px;
         font-size: 18px;
         margin-top: 10px;
         border-radius: 8px;
         border: none;
+        width: 100%;
     }
 
     button {
@@ -55,14 +61,32 @@
         margin-top: 12px;
         font-size: 22px;
     }
+
+    #ranking {
+        margin-top: 10px;
+        font-size: 14px;
+        opacity: 0.8;
+    }
 </style>
 </head>
 <body>
 
 <h1>Indovina la Serie</h1>
 
+<p style="max-width:650px;margin:10px auto 0;font-size:15px;line-height:1.4;">
+Il computer genera una sequenza segreta di 5 cifre (da 0 a 9).  
+Tu provi a indovinarla: ad ogni tentativo ricevi dei simboli che indicano:
+<br><strong>• numero giusto in posizione giusta</strong><br>
+<strong>• numero giusto in posizione sbagliata</strong><br>
+Hai un numero limitato di tentativi in base al livello scelto.
+</p>
+
 <!-- MENU INIZIALE -->
 <div id="styleSelector">
+
+    <h2>Inserisci il tuo nome</h2>
+    <input type="text" id="playerName" placeholder="Il tuo nome">
+
     <h2>Scegli lo stile dei simboli</h2>
 
     <select id="signalStyle">
@@ -86,6 +110,8 @@
     </select>
 
     <button onclick="startGame()">Inizia</button>
+
+    <div id="ranking"></div>
 </div>
 
 <!-- AREA DI GIOCO -->
@@ -111,6 +137,31 @@ let symbols = { green: "🟢", red: "🔴" };
 let attempts = 0;
 let maxAttempts = 8;
 
+let player = "";
+let bestAttempts = null;
+let bestLevel = null;
+let bestPlayer = "";
+
+function loadRanking() {
+    const saved = localStorage.getItem("indovina_best");
+    if (saved) {
+        const data = JSON.parse(saved);
+        bestAttempts = data.bestAttempts;
+        bestLevel = data.bestLevel;
+        bestPlayer = data.bestPlayer;
+    }
+    updateRankingView();
+}
+
+function updateRankingView() {
+    const r = document.getElementById("ranking");
+    if (bestAttempts === null) {
+        r.textContent = "Nessun record ancora registrato.";
+    } else {
+        r.textContent = "Miglior risultato: " + bestAttempts + " tentativi (" + bestLevel + ") — di " + bestPlayer;
+    }
+}
+
 // GENERA NUMERO SEGRETO
 function generateSecret() {
     secret = "";
@@ -121,6 +172,9 @@ function generateSecret() {
 
 // AVVIO GIOCO
 function startGame() {
+    player = document.getElementById("playerName").value.trim();
+    if (player === "") player = "Giocatore";
+
     const style = document.getElementById("signalStyle").value;
     const level = document.getElementById("gameLevel").value;
 
@@ -144,7 +198,7 @@ function startGame() {
     if (level === "pro") maxAttempts = 6;
 
     attempts = 0;
-    document.getElementById("results").innerHTML = "";
+    document.getElementById("results").innerHTML = `<p>Giocatore: <strong>${player}</strong></p>`;
 
     document.getElementById("styleSelector").style.display = "none";
     document.getElementById("gameArea").style.display = "block";
@@ -213,6 +267,22 @@ function checkGuess(guess) {
 
     if (green === 5) {
         document.getElementById("results").innerHTML += `<h2>Hai indovinato! 🎉</h2>`;
+
+        // aggiorna classifica
+        if (bestAttempts === null || attempts < bestAttempts) {
+            const levelText = document.getElementById("gameLevel").selectedOptions[0].textContent;
+            bestAttempts = attempts;
+            bestLevel = levelText;
+            bestPlayer = player;
+
+            localStorage.setItem("indovina_best", JSON.stringify({
+                bestAttempts,
+                bestLevel,
+                bestPlayer
+            }));
+
+            updateRankingView();
+        }
         return;
     }
 
@@ -222,6 +292,8 @@ function checkGuess(guess) {
         `;
     }
 }
+
+loadRanking();
 </script>
 
 </body>
