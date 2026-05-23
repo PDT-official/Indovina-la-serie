@@ -23,11 +23,6 @@
         margin-top: 20px;
     }
 
-    #styleSelector h2 {
-        text-align: center;
-        margin-bottom: 10px;
-    }
-
     select, button, input[type="text"] {
         padding: 10px;
         font-size: 18px;
@@ -41,10 +36,6 @@
         background: #4caf50;
         color: white;
         cursor: pointer;
-    }
-
-    #inputBoxes {
-        margin-top: 20px;
     }
 
     .digit {
@@ -62,24 +53,44 @@
         font-size: 22px;
     }
 
-    #ranking {
-        margin-top: 10px;
-        font-size: 14px;
-        opacity: 0.8;
+    /* ------------------ ANIMAZIONI ------------------ */
+
+    /* Fade-in scimmia */
+    .fadeIn {
+        animation: fadeIn 0.8s ease forwards;
     }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Glow vittoria */
+    .winGlow {
+        animation: winGlow 1.2s ease-in-out forwards;
+    }
+    @keyframes winGlow {
+        0% { filter: drop-shadow(0 0 0px #00ffea); }
+        50% { filter: drop-shadow(0 0 25px #00ffea); }
+        100% { filter: drop-shadow(0 0 0px #00ffea); }
+    }
+
+    /* Shake errore */
+    .shake {
+        animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        50% { transform: translateX(6px); }
+        75% { transform: translateX(-6px); }
+        100% { transform: translateX(0); }
+    }
+
 </style>
 </head>
 <body>
 
 <h1>Indovina la Serie</h1>
-
-<p style="max-width:650px;margin:10px auto 0;font-size:15px;line-height:1.4;">
-Il computer genera una sequenza segreta di 5 cifre (da 0 a 9).  
-Tu provi a indovinarla: ad ogni tentativo ricevi dei simboli che indicano:
-<br><strong>• numero giusto in posizione giusta</strong><br>
-<strong>• numero giusto in posizione sbagliata</strong><br>
-Hai un numero limitato di tentativi in base al livello scelto.
-</p>
 
 <!-- MENU INIZIALE -->
 <div id="styleSelector">
@@ -88,18 +99,17 @@ Hai un numero limitato di tentativi in base al livello scelto.
     <input type="text" id="playerName" placeholder="Il tuo nome">
 
     <h2>Scegli lo stile dei simboli</h2>
-
     <select id="signalStyle">
-        <option value="classic">Classico — 🟢 giusto / 🔴 sbagliato</option>
-        <option value="angeldevil">Angioletto & Diavoletto — 😇 giusto / 😈 sbagliato</option>
-        <option value="soft">Soft (cuori) — 💚 giusto / ❤️ sbagliato</option>
-        <option value="emoji">Emoji Power — ⭐ giusto / 🔥 sbagliato</option>
-        <option value="dark">Dark Mode — 💀 giusto / ☠️ sbagliato</option>
-        <option value="minimal">Minimal — ✔️ giusto / ❌ sbagliato</option>
-        <option value="geometric">Geometrico — 🟩 giusto / 🟥 sbagliato</option>
-        <option value="mind">Mind Game — 🧠 giusto / ⚠️ sbagliato</option>
-        <option value="cartoon">Cartoon — 🌟 giusto / 💢 sbagliato</option>
-        <option value="puzzle">Puzzle Mode — 🧩 giusto / 🔻 sbagliato</option>
+        <option value="classic">Classico — 🟢 / 🔴</option>
+        <option value="angeldevil">😇 / 😈</option>
+        <option value="soft">💚 / ❤️</option>
+        <option value="emoji">⭐ / 🔥</option>
+        <option value="dark">💀 / ☠️</option>
+        <option value="minimal">✔️ / ❌</option>
+        <option value="geometric">🟩 / 🟥</option>
+        <option value="mind">🧠 / ⚠️</option>
+        <option value="cartoon">🌟 / 💢</option>
+        <option value="puzzle">🧩 / 🔻</option>
     </select>
 
     <h2>Scegli il livello</h2>
@@ -210,16 +220,12 @@ function sendBoxes() {
 
     checkGuess(guess);
 
-    // Pulisce le caselle dopo ogni tentativo
     boxes.forEach(b => b.value = "");
 }
 
 function checkGuess(guess) {
 
-    if (attempts >= maxAttempts) {
-        alert("Hai già usato tutti i tentativi!");
-        return;
-    }
+    if (attempts >= maxAttempts) return;
 
     if (guess.length !== 5 || isNaN(guess)) {
         alert("Inserisci 5 numeri validi!");
@@ -260,13 +266,33 @@ function checkGuess(guess) {
         </div>
     `;
 
+    /* SHAKE se sbagli */
+    if (green !== 5 && attempts < maxAttempts) {
+        document.getElementById("results").classList.add("shake");
+        setTimeout(() => {
+            document.getElementById("results").classList.remove("shake");
+        }, 400);
+    }
+
+    /* VITTORIA */
     if (green === 5) {
         document.getElementById("results").innerHTML += `
             <h2>Hai indovinato! 🎉</h2>
-            <div style="margin-top:10px;">
+            <div class="winGlow" style="margin-top:10px;">
                 <img src="fireworks.jpg" style="width:200px; border-radius:10px;">
             </div>
             <p style="opacity:0.7;">Grande ${player}!</p>
+
+            <button onclick="resetGame()" style="
+                margin-top:20px;
+                padding:10px 20px;
+                font-size:18px;
+                border:none;
+                border-radius:8px;
+                background:#ff9800;
+                color:#000;
+                cursor:pointer;
+            ">Ricomincia</button>
         `;
 
         if (bestAttempts === null || attempts < bestAttempts) {
@@ -286,16 +312,34 @@ function checkGuess(guess) {
         return;
     }
 
+    /* SCONFITTA */
     if (attempts >= maxAttempts) {
         document.getElementById("results").innerHTML += `
             <h2>Hai finito i tentativi 😵</h2>
             <p>La serie era: <strong>${secret}</strong></p>
-            <div style="margin-top:10px;">
+            <div class="fadeIn" style="margin-top:10px;">
                 <img src="monkey.jpg" style="width:160px; border-radius:10px;">
             </div>
             <p style="opacity:0.7;">Ritenta ${player}, la scimmia ti guarda così…</p>
+
+            <button onclick="resetGame()" style="
+                margin-top:20px;
+                padding:10px 20px;
+                font-size:18px;
+                border:none;
+                border-radius:8px;
+                background:#ff9800;
+                color:#000;
+                cursor:pointer;
+            ">Ricomincia</button>
         `;
     }
+}
+
+function resetGame() {
+    document.getElementById("gameArea").style.display = "none";
+    document.getElementById("styleSelector").style.display = "block";
+    document.getElementById("results").innerHTML = "";
 }
 
 loadRanking();
@@ -306,3 +350,4 @@ loadRanking();
 </p>
 
 </body>
+</html>
