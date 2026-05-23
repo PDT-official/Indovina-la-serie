@@ -90,16 +90,16 @@ Hai un numero limitato di tentativi in base al livello scelto.
     <h2>Scegli lo stile dei simboli</h2>
 
     <select id="signalStyle">
-        <option value="classic">Classico — 🟢 numero giusto in posizione giusta / 🔴 numero giusto in posizione sbagliata</option>
-        <option value="angeldevil">Angioletto & Diavoletto — 😇 giusto in posizione giusta / 😈 giusto in posizione sbagliata</option>
-        <option value="soft">Soft (cuori) — 💚 giusto in posizione giusta / ❤️ giusto in posizione sbagliata</option>
-        <option value="emoji">Emoji Power — ⭐ giusto in posizione giusta / 🔥 giusto in posizione sbagliata</option>
-        <option value="dark">Dark Mode — 💀 giusto in posizione giusta / ☠️ giusto in posizione sbagliata</option>
-        <option value="minimal">Minimal — ✔️ giusto in posizione giusta / ❌ giusto in posizione sbagliata</option>
-        <option value="geometric">Geometrico — 🟩 giusto in posizione giusta / 🟥 giusto in posizione sbagliata</option>
-        <option value="mind">Mind Game — 🧠 giusto in posizione giusta / ⚠️ giusto in posizione sbagliata</option>
-        <option value="cartoon">Cartoon — 🌟 giusto in posizione giusta / 💢 giusto in posizione sbagliata</option>
-        <option value="puzzle">Puzzle Mode — 🧩 giusto in posizione giusta / 🔻 giusto in posizione sbagliata</option>
+        <option value="classic">Classico — 🟢 giusto / 🔴 sbagliato</option>
+        <option value="angeldevil">Angioletto & Diavoletto — 😇 giusto / 😈 sbagliato</option>
+        <option value="soft">Soft (cuori) — 💚 giusto / ❤️ sbagliato</option>
+        <option value="emoji">Emoji Power — ⭐ giusto / 🔥 sbagliato</option>
+        <option value="dark">Dark Mode — 💀 giusto / ☠️ sbagliato</option>
+        <option value="minimal">Minimal — ✔️ giusto / ❌ sbagliato</option>
+        <option value="geometric">Geometrico — 🟩 giusto / 🟥 sbagliato</option>
+        <option value="mind">Mind Game — 🧠 giusto / ⚠️ sbagliato</option>
+        <option value="cartoon">Cartoon — 🌟 giusto / 💢 sbagliato</option>
+        <option value="puzzle">Puzzle Mode — 🧩 giusto / 🔻 sbagliato</option>
     </select>
 
     <h2>Scegli il livello</h2>
@@ -162,7 +162,6 @@ function updateRankingView() {
     }
 }
 
-// GENERA NUMERO SEGRETO
 function generateSecret() {
     secret = "";
     for (let i = 0; i < 5; i++) {
@@ -170,7 +169,6 @@ function generateSecret() {
     }
 }
 
-// AVVIO GIOCO
 function startGame() {
     player = document.getElementById("playerName").value.trim();
     if (player === "") player = "Giocatore";
@@ -178,7 +176,6 @@ function startGame() {
     const style = document.getElementById("signalStyle").value;
     const level = document.getElementById("gameLevel").value;
 
-    // IMPOSTA SIMBOLI
     switch(style) {
         case "classic": symbols.green = "🟢"; symbols.red = "🔴"; break;
         case "angeldevil": symbols.green = "😇"; symbols.red = "😈"; break;
@@ -192,7 +189,6 @@ function startGame() {
         case "puzzle": symbols.green = "🧩"; symbols.red = "🔻"; break;
     }
 
-    // IMPOSTA LIVELLO
     if (level === "rookie") maxAttempts = 10;
     if (level === "semipro") maxAttempts = 8;
     if (level === "pro") maxAttempts = 6;
@@ -206,7 +202,6 @@ function startGame() {
     generateSecret();
 }
 
-// RACCOGLIE LE 5 CASELLE
 function sendBoxes() {
     const boxes = document.querySelectorAll(".digit");
     let guess = "";
@@ -216,7 +211,6 @@ function sendBoxes() {
     checkGuess(guess);
 }
 
-// CONTROLLO TENTATIVO
 function checkGuess(guess) {
 
     if (attempts >= maxAttempts) {
@@ -237,7 +231,6 @@ function checkGuess(guess) {
     let secretArr = secret.split("");
     let guessArr = guess.split("");
 
-    // GIUSTO-GIUSTO
     for (let i = 0; i < 5; i++) {
         if (guessArr[i] === secretArr[i]) {
             green++;
@@ -245,7 +238,6 @@ function checkGuess(guess) {
         }
     }
 
-    // GIUSTO-SBAGLIATO
     for (let i = 0; i < 5; i++) {
         if (guessArr[i] !== null) {
             let index = secretArr.indexOf(guessArr[i]);
@@ -266,9 +258,12 @@ function checkGuess(guess) {
     `;
 
     if (green === 5) {
-        document.getElementById("results").innerHTML += `<h2>Hai indovinato! 🎉</h2>`;
+        document.getElementById("results").innerHTML += `
+            <h2>Hai indovinato! 🎉</h2>
+            <div style="font-size:50px; margin-top:10px;">🏆</div>
+            <p style="opacity:0.7;">Grande ${player}!</p>
+        `;
 
-        // aggiorna classifica
         if (bestAttempts === null || attempts < bestAttempts) {
             const levelText = document.getElementById("gameLevel").selectedOptions[0].textContent;
             bestAttempts = attempts;
@@ -288,13 +283,20 @@ function checkGuess(guess) {
 
     if (attempts >= maxAttempts) {
         document.getElementById("results").innerHTML += `
-            <h2>Hai finito i tentativi 😵<br>La serie era: ${secret}</h2>
+            <h2>Hai finito i tentativi 😵</h2>
+            <p>La serie era: <strong>${secret}</strong></p>
+            <div style="font-size:50px; margin-top:10px;">🙈😂</div>
+            <p style="opacity:0.7;">Ritenta ${player}, sei stato coraggioso!</p>
         `;
     }
 }
 
 loadRanking();
 </script>
+
+<p style="opacity:0.5; font-size:12px; margin-top:40px;">
+    MLance26
+</p>
 
 </body>
 </html>
