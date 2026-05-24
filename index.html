@@ -70,17 +70,6 @@
         100% { filter: drop-shadow(0 0 0px #00ffea); }
     }
 
-    .shake {
-        animation: shake 0.4s ease;
-    }
-    @keyframes shake {
-        0% { transform: translateX(0); }
-        25% { transform: translateX(-6px); }
-        50% { transform: translateX(6px); }
-        75% { transform: translateX(-6px); }
-        100% { transform: translateX(0); }
-    }
-
     @keyframes screenShake {
       0% { transform: translate(0, 0); }
       20% { transform: translate(-10px, 5px); }
@@ -93,7 +82,7 @@
 </head>
 <body>
 
-<!-- DEBUG BOX (SEQUENZA SEGRETA) -->
+<!-- DEBUG BOX -->
 <div id="secretDebugBox" style="
     position:fixed;
     top:10px;
@@ -113,22 +102,21 @@
 <audio id="fwAudio" src="fireworks_sound.mp3" loop></audio>
 <audio id="boomAudio" src="boom.mp3"></audio>
 
-<!-- VIDEO FUOCHI (FIX AUTOPLAY) -->
+<!-- VIDEO FUOCHI (CORRETTO) -->
 <video id="fireworksVideo" muted playsinline style="
     position:fixed;
-    top:0;
-    left:0;
+    top:50%;
+    left:50%;
     width:100vw;
-    height:100vh;
-    object-fit:cover;
+    height:auto;
+    max-height:100vh;
+    transform:translate(-50%, -50%);
+    object-fit:contain;
     visibility:hidden;
     z-index:999;
 ">
     <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
 </video>
-
-
-<div id="fwOverlay"></div>
 
 <h1>Indovina la Serie</h1>
 
@@ -287,203 +275,6 @@ function updateRankingView() {
         r.textContent = "Miglior risultato: " + bestAttempts + " tentativi (" + bestLevel + ") — di " + bestPlayer;
     }
 }
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<title>Indovina la Serie</title>
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: #fff;
-        text-align: center;
-        padding: 20px;
-    }
-
-    #styleSelector, #gameArea {
-        background: #222;
-        padding: 20px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 550px;
-        margin: auto;
-        margin-top: 20px;
-    }
-
-    select, button, input[type="text"] {
-        padding: 10px;
-        font-size: 18px;
-        margin-top: 10px;
-        border-radius: 8px;
-        border: none;
-        width: 100%;
-    }
-
-    button {
-        background: #4caf50;
-        color: white;
-        cursor: pointer;
-    }
-
-    .digit {
-        width: 45px;
-        height: 45px;
-        font-size: 26px;
-        text-align: center;
-        margin: 5px;
-        border-radius: 6px;
-        border: none;
-    }
-
-    .attempt {
-        margin-top: 12px;
-        font-size: 22px;
-    }
-
-    .fadeIn {
-        animation: fadeIn 0.8s ease forwards;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.8); }
-        to { opacity: 1; transform: scale(1); }
-    }
-
-    .winGlow {
-        animation: winGlow 1.2s ease-in-out forwards;
-    }
-    @keyframes winGlow {
-        0% { filter: drop-shadow(0 0 0px #00ffea); }
-        50% { filter: drop-shadow(0 0 25px #00ffea); }
-        100% { filter: drop-shadow(0 0 0px #00ffea); }
-    }
-
-    @keyframes screenShake {
-      0% { transform: translate(0, 0); }
-      20% { transform: translate(-10px, 5px); }
-      40% { transform: translate(8px, -8px); }
-      60% { transform: translate(-6px, 6px); }
-      80% { transform: translate(4px, -4px); }
-      100% { transform: translate(0, 0); }
-    }
-</style>
-</head>
-<body>
-
-<!-- DEBUG BOX -->
-<div id="secretDebugBox" style="
-    position:fixed;
-    top:10px;
-    right:10px;
-    background:#0f0;
-    color:#000;
-    padding:8px 12px;
-    border-radius:6px;
-    font-size:18px;
-    font-weight:bold;
-    z-index:9999;
-">
-    SEQUENZA: -----
-</div>
-
-<!-- AUDIO -->
-<audio id="fwAudio" src="fireworks_sound.mp3" loop></audio>
-<audio id="boomAudio" src="boom.mp3"></audio>
-
-<!-- VIDEO FUOCHI (VERSIONE CORRETTA) -->
-<video id="fireworksVideo" muted playsinline style="
-    position:fixed;
-    top:50%;
-    left:50%;
-    width:100vw;
-    height:auto;
-    max-height:100vh;
-    transform:translate(-50%, -50%);
-    object-fit:contain;
-    visibility:hidden;
-    z-index:999;
-">
-    <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
-</video>
-
-<h1>Indovina la Serie</h1>
-
-<p style="max-width:650px;margin:10px auto 0;font-size:15px;line-height:1.4;">
-Il computer genera una sequenza segreta di 5 cifre (da 0 a 9).  
-Tu provi a indovinarla: ad ogni tentativo ricevi dei simboli che indicano:
-<br><strong>• numero giusto in posizione giusta</strong><br>
-<strong>• numero giusto in posizione sbagliata</strong><br>
-Hai un numero limitato di tentativi in base al livello scelto.
-</p>
-
-<p style="max-width:650px;margin:5px auto 0;font-size:13px;opacity:0.7;">
-Nota: la sequenza segreta <strong>non contiene numeri ripetuti</strong>.  
-Ogni tentativo è valutato indipendentemente.
-</p>
-
-<div id="styleSelector">
-
-    <h2>Inserisci il tuo nome</h2>
-    <input type="text" id="playerName" placeholder="Il tuo nome">
-
-    <h2>Scegli lo stile dei simboli</h2>
-    <select id="signalStyle">
-        <option value="classic">Classico — 🟢 / 🔴</option>
-        <option value="angeldevil">😇 / 😈</option>
-        <option value="soft">💚 / ❤️</option>
-        <option value="emoji">⭐ / 🔥</option>
-        <option value="dark">💀 / ☠️</option>
-        <option value="minimal">✔️ / ❌</option>
-        <option value="geometric">🟩 / 🟥</option>
-        <option value="mind">🧠 / ⚠️</option>
-        <option value="cartoon">🌟 / 💢</option>
-        <option value="puzzle">🧩 / 🔻</option>
-    </select>
-
-    <h2>Scegli il livello</h2>
-    <select id="gameLevel">
-        <option value="rookie">Rookie — 10 tentativi</option>
-        <option value="semipro">Semi‑Pro — 8 tentativi</option>
-        <option value="pro">Pro — 6 tentativi</option>
-    </select>
-
-    <button onclick="startGame()">Inizia</button>
-
-    <div id="ranking"></div>
-</div>
-
-<div id="gameArea" style="display:none;">
-    <h2>Inserisci la sequenza di 5 numeri</h2>
-
-    <div id="inputBoxes">
-        <input class="digit" maxlength="1">
-        <input class="digit" maxlength="1">
-        <input class="digit" maxlength="1">
-        <input class="digit" maxlength="1">
-        <input class="digit" maxlength="1">
-    </div>
-
-    <button onclick="sendBoxes()">Invia</button>
-
-    <div id="results"></div>
-</div>
-
-<p style="opacity:0.5; font-size:12px; margin-top:40px;">
-    MLance26
-</p>
-
-<script>
-let secret = "";
-let symbols = { green: "🟢", red: "🔴" };
-let attempts = 0;
-let maxAttempts = 8;
-
-let player = "";
-let bestAttempts = null;
-let bestLevel = null;
-let bestPlayer = "";
 /* ------------------ SEQUENZA ------------------ */
 
 function generateSecret() {
@@ -496,7 +287,7 @@ function generateSecret() {
         digits.splice(index, 1);
     }
 
-    // DEBUG: mostra la sequenza nel box fisso
+    // DEBUG
     document.getElementById("secretDebugBox").textContent = "SEQUENZA: " + secret;
 }
 
@@ -647,7 +438,6 @@ function checkGuess(guess) {
             updateRankingView();
         }
 
-        // AVVIO FUOCHI + BOOM ALLA VITTORIA
         startFireworks(document.getElementById("gameLevel").value);
 
         return;
@@ -680,6 +470,7 @@ function checkGuess(guess) {
         `;
     }
 }
+
 /* ------------------ RESET ------------------ */
 
 function resetGame() {
@@ -697,27 +488,21 @@ const fwSource = document.getElementById("fwSource");
 
 function startFireworks(level) {
 
-    // Scegli il video corretto
     if (level === "rookie") fwSource.src = "fireworks_rookie.mp4";
     if (level === "semipro") fwSource.src = "fireworks_semipro.mp4";
     if (level === "pro") fwSource.src = "fireworks_pro.mp4";
 
-    // Reset audio
     video.load();
     fw.currentTime = 0;
     boom.currentTime = 0;
 
-    // Mostra il video (centrato, non zoomato)
     video.style.visibility = "visible";
 
-    // Avvia il video (muted = autoplay ok)
     video.play().catch(e => console.log("Video bloccato:", e));
 
-    // Audio loop (continua finché dura il video)
     fw.loop = true;
     fw.play();
 
-    // Boom dopo 1.2s
     setTimeout(() => {
         boom.play();
 
@@ -728,7 +513,6 @@ function startFireworks(level) {
 
     }, 1200);
 
-    // Quando il video finisce → spegni tutto
     video.onended = () => {
         fw.pause();
         fw.currentTime = 0;
