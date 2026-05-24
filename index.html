@@ -429,32 +429,31 @@ function checkGuess(guess) {
         return;
     }
 
-    /* ------------------ SCONFITTA ------------------ */
+ /* ------------------ SCONFITTA ------------------ */
 
-    if (attempts >= maxAttempts) {
+if (attempts >= maxAttempts) {
 
-        const line = monkeyLines[Math.floor(Math.random() * monkeyLines.length)];
+    const line = monkeyLines[Math.floor(Math.random() * monkeyLines.length)];
 
-        document.getElementById("results").innerHTML += `
-            <h2>Hai finito i tentativi 😵</h2>
-            <p>La serie era: <strong>${secret}</strong></p>
-            <div class="fadeIn" style="margin-top:10px;">
-                <img src="monkey.jpg" style="width:160px; border-radius:10px;">
-            </div>
-            <p style="opacity:0.7; margin-top:10px;"><strong>${line}</strong></p>
+    document.getElementById("results").innerHTML += `
+        <h2>Hai finito i tentativi 😵</h2>
+        <p>La serie era: <strong>${secret}</strong></p>
+        <div class="fadeIn" style="margin-top:10px;">
+            <video src="monkey.mp4" autoplay loop muted playsinline style="width:160px; border-radius:10px;"></video>
+        </div>
+        <p style="opacity:0.7; margin-top:10px;"><strong>${line}</strong></p>
 
-            <button onclick="resetGame()" style="
-                margin-top:20px;
-                padding:10px 20px;
-                font-size:18px;
-                border:none;
-                border-radius:8px;
-                background:#ff9800;
-                color:#000;
-                cursor:pointer;
-            ">Ricomincia</button>
-        `;
-    }
+        <button onclick="resetGame()" style="
+            margin-top:20px;
+            padding:10px 20px;
+            font-size:18px;
+            border:none;
+            border-radius:8px;
+            background:#ff9800;
+            color:#000;
+            cursor:pointer;
+        ">Ricomincia</button>
+    `;
 }
 
 /* ------------------ RESET ------------------ */
