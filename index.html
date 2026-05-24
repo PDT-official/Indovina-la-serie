@@ -115,6 +115,7 @@
 <div id="fwOverlay"></div>
 
 <h1>Indovina la Serie</h1>
+<p id="debugSecret" style="color:#0f0; font-size:20px; margin-top:5px;"></p>
 
 <p style="max-width:650px;margin:10px auto 0;font-size:15px;line-height:1.4;">
 Il computer genera una sequenza segreta di 5 cifre (da 0 a 9).  
@@ -273,7 +274,6 @@ function updateRankingView() {
 }
 
 /* ------------------ SEQUENZA ------------------ */
-
 function generateSecret() {
     let digits = ["0","1","2","3","4","5","6","7","8","9"];
     secret = "";
@@ -283,6 +283,9 @@ function generateSecret() {
         secret += digits[index];
         digits.splice(index, 1);
     }
+
+    // MOSTRA LA SEQUENZA (DEBUG)
+    document.getElementById("debugSecret").textContent = "SEQUENZA SEGRETA: " + secret;
 }
 
 /* ------------------ START GAME ------------------ */
