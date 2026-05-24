@@ -495,12 +495,16 @@ function resetGame() {
     document.getElementById("results").innerHTML = "";
 }
 
-/* ------------------ FUOCHI + BOOM ------------------ */
+/* ------------------ FUOCHI + BOOM + MONKEY ------------------ */
 
 const video = document.getElementById("fireworksVideo");
 const fw = document.getElementById("fwAudio");
 const boom = document.getElementById("boomAudio");
 const fwSource = document.getElementById("fwSource");
+
+const monkeyVideo = document.getElementById("monkeyVideo"); // <--- IMPORTANTE
+
+/* ------------------ FUOCHI ------------------ */
 
 function startFireworks(level) {
 
@@ -542,6 +546,25 @@ function startFireworks(level) {
         boom.pause();
         fw.currentTime = 0;
         boom.currentTime = 0;
+    }, 7000);
+}
+
+/* ------------------ MONKEY ------------------ */
+
+function startMonkey() {
+
+    // Mostra il video overlay
+    monkeyVideo.style.visibility = "visible";
+    monkeyVideo.currentTime = 0;
+
+    // Avvia il video
+    monkeyVideo.play().catch(e => console.log("Video monkey bloccato:", e));
+
+    // Spegnimento forzato dopo 7 secondi
+    setTimeout(() => {
+        monkeyVideo.pause();
+        monkeyVideo.currentTime = 0;
+        monkeyVideo.style.visibility = "hidden";
     }, 7000);
 }
 
