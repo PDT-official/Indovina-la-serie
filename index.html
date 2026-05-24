@@ -53,7 +53,6 @@
         font-size: 22px;
     }
 
-    /* Fade-in scimmia */
     .fadeIn {
         animation: fadeIn 0.8s ease forwards;
     }
@@ -62,7 +61,6 @@
         to { opacity: 1; transform: scale(1); }
     }
 
-    /* Glow vittoria */
     .winGlow {
         animation: winGlow 1.2s ease-in-out forwards;
     }
@@ -72,7 +70,6 @@
         100% { filter: drop-shadow(0 0 0px #00ffea); }
     }
 
-    /* Shake errore */
     .shake {
         animation: shake 0.4s ease;
     }
@@ -152,6 +149,8 @@ Ogni tentativo è valutato indipendentemente.
 <p style="opacity:0.5; font-size:12px; margin-top:40px;">
     MLance26
 </p>
+
+<script>
 let secret = "";
 let symbols = { green: "🟢", red: "🔴" };
 let attempts = 0;
@@ -221,13 +220,9 @@ const almostLines = [
     "Sei a un passo... eppure lontanissimo."
 ];
 
-<script>
-
 /* ------------------ RANKING ------------------ */
 
 function loadRanking() {
-    ...
-
     const saved = localStorage.getItem("indovina_best");
     if (saved) {
         const data = JSON.parse(saved);
@@ -247,7 +242,7 @@ function updateRankingView() {
     }
 }
 
-/* ------------------ SEQUENZA SENZA DOPPIONI ------------------ */
+/* ------------------ SEQUENZA ------------------ */
 
 function generateSecret() {
     let digits = ["0","1","2","3","4","5","6","7","8","9"];
@@ -295,7 +290,7 @@ function startGame() {
     generateSecret();
 }
 
-/* ------------------ INVIO TENTATIVO ------------------ */
+/* ------------------ INVIO ------------------ */
 
 function sendBoxes() {
     const boxes = document.querySelectorAll(".digit");
@@ -308,7 +303,7 @@ function sendBoxes() {
     boxes.forEach(b => b.value = "");
 }
 
-/* ------------------ LOGICA TENTATIVO ------------------ */
+/* ------------------ LOGICA ------------------ */
 
 function checkGuess(guess) {
 
@@ -353,7 +348,6 @@ function checkGuess(guess) {
         </div>
     `;
 
-    /* Frasi speciali DURANTE il gioco */
     if (green === 0 && red === 0) {
         const zLine = zeroLines[Math.floor(Math.random() * zeroLines.length)];
         document.getElementById("results").innerHTML += `
@@ -368,7 +362,6 @@ function checkGuess(guess) {
         `;
     }
 
-    /* SHAKE se sbagli */
     if (green !== 5 && attempts < maxAttempts) {
         document.getElementById("results").classList.add("shake");
         setTimeout(() => {
@@ -432,31 +425,32 @@ function checkGuess(guess) {
         return;
     }
 
- /* ------------------ SCONFITTA ------------------ */
+    /* ------------------ SCONFITTA ------------------ */
 
-if (attempts >= maxAttempts) {
+    if (attempts >= maxAttempts) {
 
-    const line = monkeyLines[Math.floor(Math.random() * monkeyLines.length)];
+        const line = monkeyLines[Math.floor(Math.random() * monkeyLines.length)];
 
-    document.getElementById("results").innerHTML += `
-        <h2>Hai finito i tentativi 😵</h2>
-        <p>La serie era: <strong>${secret}</strong></p>
-        <div class="fadeIn" style="margin-top:10px;">
-            <video src="monkey.mp4" autoplay loop muted playsinline style="width:160px; border-radius:10px;"></video>
-        </div>
-        <p style="opacity:0.7; margin-top:10px;"><strong>${line}</strong></p>
+        document.getElementById("results").innerHTML += `
+            <h2>Hai finito i tentativi 😵</h2>
+            <p>La serie era: <strong>${secret}</strong></p>
+            <div class="fadeIn" style="margin-top:10px;">
+                <video src="monkey.mp4" autoplay loop muted playsinline style="width:160px; border-radius:10px;"></video>
+            </div>
+            <p style="opacity:0.7; margin-top:10px;"><strong>${line}</strong></p>
 
-        <button onclick="resetGame()" style="
-            margin-top:20px;
-            padding:10px 20px;
-            font-size:18px;
-            border:none;
-            border-radius:8px;
-            background:#ff9800;
-            color:#000;
-            cursor:pointer;
-        ">Ricomincia</button>
-    `;
+            <button onclick="resetGame()" style="
+                margin-top:20px;
+                padding:10px 20px;
+                font-size:18px;
+                border:none;
+                border-radius:8px;
+                background:#ff9800;
+                color:#000;
+                cursor:pointer;
+            ">Ricomincia</button>
+        `;
+    }
 }
 
 /* ------------------ RESET ------------------ */
