@@ -512,8 +512,8 @@ function startFireworks(level) {
     fw.currentTime = 0;
     boom.currentTime = 0;
 
-    // MOSTRA IL VIDEO
-    video.style.display = "block";
+    // MOSTRA IL VIDEO (senza display:none)
+    video.style.visibility = "visible";
 
     video.play();
     fw.play();
