@@ -113,8 +113,8 @@
 <audio id="fwAudio" src="fireworks_sound.mp3"></audio>
 <audio id="boomAudio" src="boom.mp3"></audio>
 
-<!-- VIDEO FUOCHI -->
-<video id="fireworksVideo" style="width:100%; visibility:hidden;">
+<!-- VIDEO FUOCHI (FIX AUTOPLAY) -->
+<video id="fireworksVideo" muted playsinline style="width:100%; visibility:hidden;">
     <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
 </video>
 
@@ -196,6 +196,7 @@ let player = "";
 let bestAttempts = null;
 let bestLevel = null;
 let bestPlayer = "";
+
 /* ------------------ ARRAY FRASI ------------------ */
 
 const monkeyLines = [
@@ -385,6 +386,7 @@ function checkGuess(guess) {
             <span style="font-size:14px; opacity:0.7;"> (${attempts}/${maxAttempts})</span>
         </div>
     `;
+
     /* ------------------ VITTORIA ------------------ */
 
     if (green === 5) {
@@ -498,11 +500,13 @@ function startFireworks(level) {
     fw.currentTime = 0;
     boom.currentTime = 0;
 
-    // MOSTRA IL VIDEO
-    video.style.display = "block";
+    // Mostra il video (era visibility:hidden)
     video.style.visibility = "visible";
 
+    // Parte il video (muted + playsinline = autoplay ok)
     video.play().catch(e => console.log("Video bloccato:", e));
+
+    // Audio separato
     fw.play();
 
     setTimeout(() => {
@@ -522,4 +526,3 @@ loadRanking();
 </script>
 
 </body>
-</html>
