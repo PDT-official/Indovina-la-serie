@@ -488,21 +488,27 @@ const fwSource = document.getElementById("fwSource");
 
 function startFireworks(level) {
 
+    // Scegli il video corretto
     if (level === "rookie") fwSource.src = "fireworks_rookie.mp4";
     if (level === "semipro") fwSource.src = "fireworks_semipro.mp4";
     if (level === "pro") fwSource.src = "fireworks_pro.mp4";
 
+    // Reset audio e video
     video.load();
     fw.currentTime = 0;
     boom.currentTime = 0;
 
+    // Mostra il video
     video.style.visibility = "visible";
 
+    // Avvia il video
     video.play().catch(e => console.log("Video bloccato:", e));
 
+    // Avvia audio loop
     fw.loop = true;
     fw.play();
 
+    // Boom dopo 1.2s
     setTimeout(() => {
         boom.play();
 
@@ -513,14 +519,16 @@ function startFireworks(level) {
 
     }, 1200);
 
-    video.onended = () => {
-        fw.pause();
-        fw.currentTime = 0;
-        boom.pause();
-        boom.currentTime = 0;
+    // Spegnimento forzato dopo 7 secondi
+    setTimeout(() => {
         video.style.visibility = "hidden";
-    };
+        fw.pause();
+        boom.pause();
+        fw.currentTime = 0;
+        boom.currentTime = 0;
+    }, 7000);
 }
+
 
 /* ------------------ INIT ------------------ */
 
