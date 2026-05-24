@@ -222,9 +222,13 @@ const almostLines = [
     "Sei a un passo... eppure lontanissimo."
 ];
 
+<script>
+
 /* ------------------ RANKING ------------------ */
 
 function loadRanking() {
+    ...
+
     const saved = localStorage.getItem("indovina_best");
     if (saved) {
         const data = JSON.parse(saved);
