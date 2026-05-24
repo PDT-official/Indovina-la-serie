@@ -118,6 +118,8 @@
     <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
 </video>
 
+<div id="fwOverlay"></div>
+
 <h1>Indovina la Serie</h1>
 
 <p style="max-width:650px;margin:10px auto 0;font-size:15px;line-height:1.4;">
@@ -126,6 +128,11 @@ Tu provi a indovinarla: ad ogni tentativo ricevi dei simboli che indicano:
 <br><strong>• numero giusto in posizione giusta</strong><br>
 <strong>• numero giusto in posizione sbagliata</strong><br>
 Hai un numero limitato di tentativi in base al livello scelto.
+</p>
+
+<p style="max-width:650px;margin:5px auto 0;font-size:13px;opacity:0.7;">
+Nota: la sequenza segreta <strong>non contiene numeri ripetuti</strong>.  
+Ogni tentativo è valutato indipendentemente.
 </p>
 
 <div id="styleSelector">
@@ -189,8 +196,89 @@ let player = "";
 let bestAttempts = null;
 let bestLevel = null;
 let bestPlayer = "";
+/* ------------------ ARRAY FRASI ------------------ */
+
+const monkeyLines = [
+    "Lascia stare... non è gioco per te!!!",
+    "Ma davvero pensavi di vincere?",
+    "Umano... non sei pronto.",
+    "Ti ho letto nel pensiero... male.",
+    "Ti manca qualcosa... tipo il talento.",
+    "Mi sto annoiando... migliora.",
+    "Questa era facile... per ME.",
+    "Riprova pure... io intanto mi riposo.",
+    "Ti ho visto... e non è stato un bello spettacolo."
+];
+
+const winLines = [
+    "Bravo... ma non montarti la testa.",
+    "Hai vinto... per ora.",
+    "Ok, questa ti è uscita bene.",
+    "Non male, umano. Non male.",
+    "Hai avuto fortuna... ammettilo.",
+    "Questa volta hai fatto centro.",
+    "Ti concedo questa vittoria.",
+    "Mh... interessante. Hai imparato qualcosa.",
+    "Bravo. Ma la prossima ti distrugge.",
+    "Ok, ok... rispetto."
+];
+
+const firstTryLines = [
+    "Ok... questa è fortuna pura.",
+    "Primo colpo? Non ci credo manco io.",
+    "Calma... non sei un genio, è solo culo.",
+    "Wow. Hai spaventato anche la scimmia.",
+    "Ok, rispetto. Ma non abituarti."
+];
+
+const lastTryLines = [
+    "Ultimo colpo... hai sudato eh?",
+    "Questa è stata brutta. Ma ci sei arrivato.",
+    "All’ultimo? Ti piace rischiare la vita.",
+    "Hai vinto... ma sei stato a un passo dal disastro.",
+    "Ok, ok... hai fegato."
+];
+
+const zeroLines = [
+    "Wow... zero? Ma come hai fatto?",
+    "Nemmeno per sbaglio ne hai preso uno.",
+    "Questo è un talento... al contrario.",
+    "La scimmia sta ridendo. Forte.",
+    "Zero su zero... rispetto."
+];
+
+const almostLines = [
+    "Ahahah... ci sei andato vicino. Ma no.",
+    "Cinque rossi? Che tortura.",
+    "Quasi... ma quasi non basta.",
+    "Ti vedo sudare. Continua.",
+    "Sei a un passo... eppure lontanissimo."
+];
+
+/* ------------------ RANKING ------------------ */
+
+function loadRanking() {
+    const saved = localStorage.getItem("indovina_best");
+    if (saved) {
+        const data = JSON.parse(saved);
+        bestAttempts = data.bestAttempts;
+        bestLevel = data.bestLevel;
+        bestPlayer = data.bestPlayer;
+    }
+    updateRankingView();
+}
+
+function updateRankingView() {
+    const r = document.getElementById("ranking");
+    if (bestAttempts === null) {
+        r.textContent = "Nessun record ancora registrato.";
+    } else {
+        r.textContent = "Miglior risultato: " + bestAttempts + " tentativi (" + bestLevel + ") — di " + bestPlayer;
+    }
+}
 
 /* ------------------ SEQUENZA ------------------ */
+
 function generateSecret() {
     let digits = ["0","1","2","3","4","5","6","7","8","9"];
     secret = "";
@@ -201,7 +289,7 @@ function generateSecret() {
         digits.splice(index, 1);
     }
 
-    // DEBUG BOX
+    // DEBUG: mostra la sequenza nel box fisso
     document.getElementById("secretDebugBox").textContent = "SEQUENZA: " + secret;
 }
 
@@ -213,6 +301,19 @@ function startGame() {
 
     const style = document.getElementById("signalStyle").value;
     const level = document.getElementById("gameLevel").value;
+
+    switch(style) {
+        case "classic": symbols.green = "🟢"; symbols.red = "🔴"; break;
+        case "angeldevil": symbols.green = "😇"; symbols.red = "😈"; break;
+        case "soft": symbols.green = "💚"; symbols.red = "❤️"; break;
+        case "emoji": symbols.green = "⭐"; symbols.red = "🔥"; break;
+        case "dark": symbols.green = "💀"; symbols.red = "☠️"; break;
+        case "minimal": symbols.green = "✔️"; symbols.red = "❌"; break;
+        case "geometric": symbols.green = "🟩"; symbols.red = "🟥"; break;
+        case "mind": symbols.green = "🧠"; symbols.red = "⚠️"; break;
+        case "cartoon": symbols.green = "🌟"; symbols.red = "💢"; break;
+        case "puzzle": symbols.green = "🧩"; symbols.red = "🔻"; break;
+    }
 
     if (level === "rookie") maxAttempts = 10;
     if (level === "semipro") maxAttempts = 8;
@@ -284,10 +385,33 @@ function checkGuess(guess) {
             <span style="font-size:14px; opacity:0.7;"> (${attempts}/${maxAttempts})</span>
         </div>
     `;
+    /* ------------------ VITTORIA ------------------ */
 
     if (green === 5) {
+
+        let winLine = "";
+
+        if (attempts === 1) {
+            winLine = firstTryLines[Math.floor(Math.random() * firstTryLines.length)];
+        } 
+        else if (attempts === maxAttempts) {
+            winLine = lastTryLines[Math.floor(Math.random() * lastTryLines.length)];
+        } 
+        else {
+            winLine = winLines[Math.floor(Math.random() * winLines.length)];
+        }
+
+        let fireImg = "fireworks_rookie.jpg";
+        if (document.getElementById("gameLevel").value === "semipro") fireImg = "fireworks_semipro.jpg";
+        if (document.getElementById("gameLevel").value === "pro") fireImg = "fireworks_pro.jpg";
+
         document.getElementById("results").innerHTML += `
             <h2>Hai indovinato! 🎉</h2>
+            <div class="winGlow" style="margin-top:10px;">
+                <img src="${fireImg}" style="width:200px; border-radius:10px;">
+            </div>
+            <p style="opacity:0.7; margin-top:10px;"><strong>${winLine}</strong></p>
+
             <button onclick="resetGame()" style="
                 margin-top:20px;
                 padding:10px 20px;
@@ -300,8 +424,52 @@ function checkGuess(guess) {
             ">Ricomincia</button>
         `;
 
+        if (bestAttempts === null || attempts < bestAttempts) {
+            const levelText = document.getElementById("gameLevel").selectedOptions[0].textContent;
+            bestAttempts = attempts;
+            bestLevel = levelText;
+            bestPlayer = player;
+
+            localStorage.setItem("indovina_best", JSON.stringify({
+                bestAttempts,
+                bestLevel,
+                bestPlayer
+            }));
+
+            updateRankingView();
+        }
+
+        // AVVIO FUOCHI + BOOM ALLA VITTORIA
         startFireworks(document.getElementById("gameLevel").value);
+
         return;
+    }
+
+    /* ------------------ SCONFITTA ------------------ */
+
+    if (attempts >= maxAttempts) {
+
+        const line = monkeyLines[Math.floor(Math.random() * monkeyLines.length)];
+
+        document.getElementById("results").innerHTML += `
+            <h2>Hai finito i tentativi 😵</h2>
+            <p>La serie era: <strong>${secret}</strong></p>
+            <div class="fadeIn" style="margin-top:10px;">
+                <video src="monkey.mp4" autoplay loop muted playsinline style="width:160px; border-radius:10px;"></video>
+            </div>
+            <p style="opacity:0.7; margin-top:10px;"><strong>${line}</strong></p>
+
+            <button onclick="resetGame()" style="
+                margin-top:20px;
+                padding:10px 20px;
+                font-size:18px;
+                border:none;
+                border-radius:8px;
+                background:#ff9800;
+                color:#000;
+                cursor:pointer;
+            ">Ricomincia</button>
+        `;
     }
 }
 
@@ -330,6 +498,7 @@ function startFireworks(level) {
     fw.currentTime = 0;
     boom.currentTime = 0;
 
+    // MOSTRA IL VIDEO
     video.style.display = "block";
     video.style.visibility = "visible";
 
