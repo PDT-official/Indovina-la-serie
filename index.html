@@ -81,7 +81,6 @@
         100% { transform: translateX(0); }
     }
 
-    /* SHAKE FUOCHI */
     @keyframes screenShake {
       0% { transform: translate(0, 0); }
       20% { transform: translate(-10px, 5px); }
@@ -89,15 +88,6 @@
       60% { transform: translate(-6px, 6px); }
       80% { transform: translate(4px, -4px); }
       100% { transform: translate(0, 0); }
-    }
-
-    #fwOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
     }
 </style>
 </head>
@@ -107,12 +97,10 @@
 <audio id="fwAudio" src="fireworks_sound.mp3"></audio>
 <audio id="boomAudio" src="boom.mp3"></audio>
 
-<!-- VIDEO FUOCHI (FIX: niente display:none) -->
+<!-- VIDEO FUOCHI -->
 <video id="fireworksVideo" style="width:100%; visibility:hidden;">
     <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
 </video>
-
-<div id="fwOverlay"></div>
 
 <h1>Indovina la Serie</h1>
 <p id="debugSecret" style="color:#0f0; font-size:20px; margin-top:5px;"></p>
@@ -123,11 +111,6 @@ Tu provi a indovinarla: ad ogni tentativo ricevi dei simboli che indicano:
 <br><strong>• numero giusto in posizione giusta</strong><br>
 <strong>• numero giusto in posizione sbagliata</strong><br>
 Hai un numero limitato di tentativi in base al livello scelto.
-</p>
-
-<p style="max-width:650px;margin:5px auto 0;font-size:13px;opacity:0.7;">
-Nota: la sequenza segreta <strong>non contiene numeri ripetuti</strong>.  
-Ogni tentativo è valutato indipendentemente.
 </p>
 
 <div id="styleSelector">
@@ -186,93 +169,6 @@ let secret = "";
 let symbols = { green: "🟢", red: "🔴" };
 let attempts = 0;
 let maxAttempts = 8;
-
-let player = "";
-let bestAttempts = null;
-let bestLevel = null;
-let bestPlayer = "";
-
-/* ------------------ ARRAY FRASI ------------------ */
-
-const monkeyLines = [
-    "Lascia stare... non è gioco per te!!!",
-    "Ma davvero pensavi di vincere?",
-    "Umano... non sei pronto.",
-    "Ti ho letto nel pensiero... male.",
-    "Ti manca qualcosa... tipo il talento.",
-    "Mi sto annoiando... migliora.",
-    "Questa era facile... per ME.",
-    "Riprova pure... io intanto mi riposo.",
-    "Ti ho visto... e non è stato un bello spettacolo."
-];
-
-const winLines = [
-    "Bravo... ma non montarti la testa.",
-    "Hai vinto... per ora.",
-    "Ok, questa ti è uscita bene.",
-    "Non male, umano. Non male.",
-    "Hai avuto fortuna... ammettilo.",
-    "Questa volta hai fatto centro.",
-    "Ti concedo questa vittoria.",
-    "Mh... interessante. Hai imparato qualcosa.",
-    "Bravo. Ma la prossima ti distrugge.",
-    "Ok, ok... rispetto."
-];
-
-const firstTryLines = [
-    "Ok... questa è fortuna pura.",
-    "Primo colpo? Non ci credo manco io.",
-    "Calma... non sei un genio, è solo culo.",
-    "Wow. Hai spaventato anche la scimmia.",
-    "Ok, rispetto. Ma non abituarti."
-];
-
-const lastTryLines = [
-    "Ultimo colpo... hai sudato eh?",
-    "Questa è stata brutta. Ma ci sei arrivato.",
-    "All’ultimo? Ti piace rischiare la vita.",
-    "Hai vinto... ma sei stato a un passo dal disastro.",
-    "Ok, ok... hai fegato."
-];
-
-const zeroLines = [
-    "Wow... zero? Ma come hai fatto?",
-    "Nemmeno per sbaglio ne hai preso uno.",
-    "Questo è un talento... al contrario.",
-    "La scimmia sta ridendo. Forte.",
-    "Zero su zero... rispetto."
-];
-
-const almostLines = [
-    "Ahahah... ci sei andato vicino. Ma no.",
-    "Cinque rossi? Che tortura.",
-    "Quasi... ma quasi non basta.",
-    "Ti vedo sudare. Continua.",
-    "Sei a un passo... eppure lontanissimo."
-];
-
-/* ------------------ RANKING ------------------ */
-
-function loadRanking() {
-    const saved = localStorage.getItem("indovina_best");
-    if (saved) {
-        const data = JSON.parse(saved);
-        bestAttempts = data.bestAttempts;
-        bestLevel = data.bestLevel;
-        bestPlayer = data.bestPlayer;
-    }
-    updateRankingView();
-}
-
-function updateRankingView() {
-    const r = document.getElementById("ranking");
-    if (bestAttempts === null) {
-        r.textContent = "Nessun record ancora registrato.";
-    } else {
-        r.textContent = "Miglior risultato: " + bestAttempts + " tentativi (" + bestLevel + ") — di " + bestPlayer;
-    }
-}
-
 /* ------------------ SEQUENZA ------------------ */
 function generateSecret() {
     let digits = ["0","1","2","3","4","5","6","7","8","9"];
@@ -485,7 +381,7 @@ function checkGuess(guess) {
                 background:#ff9800;
                 color:#000;
                 cursor:pointer;
-                        ">Ricomincia</button>
+            ">Ricomincia</button>
         `;
     }
 }
