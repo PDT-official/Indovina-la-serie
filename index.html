@@ -80,9 +80,39 @@
         75% { transform: translateX(-6px); }
         100% { transform: translateX(0); }
     }
+
+    /* SHAKE FUOCHI */
+    @keyframes screenShake {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-10px, 5px); }
+      40% { transform: translate(8px, -8px); }
+      60% { transform: translate(-6px, 6px); }
+      80% { transform: translate(4px, -4px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    #fwOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
 </style>
 </head>
 <body>
+
+<!-- AUDIO -->
+<audio id="fwAudio" src="fireworks_sound.mp3"></audio>
+<audio id="boomAudio" src="boom.mp3"></audio>
+
+<!-- VIDEO FUOCHI -->
+<video id="fireworksVideo" style="width:100%; display:none;">
+    <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
+</video>
+
+<div id="fwOverlay"></div>
 
 <h1>Indovina la Serie</h1>
 
@@ -422,6 +452,10 @@ function checkGuess(guess) {
 
             updateRankingView();
         }
+
+        // AVVIO FUOCHI + BOOM ALLA VITTORIA
+        startFireworks(document.getElementById("gameLevel").value);
+
         return;
     }
 
@@ -461,21 +495,42 @@ function resetGame() {
     document.getElementById("results").innerHTML = "";
 }
 
+/* ------------------ FUOCHI + BOOM ------------------ */
+
+const video = document.getElementById("fireworksVideo");
+const fw = document.getElementById("fwAudio");
+const boom = document.getElementById("boomAudio");
+const fwSource = document.getElementById("fwSource");
+
+function startFireworks(level) {
+
+    if (level === "rookie") fwSource.src = "fireworks_rookie.mp4";
+    if (level === "semipro") fwSource.src = "fireworks_semipro.mp4";
+    if (level === "pro") fwSource.src = "fireworks_pro.mp4";
+
+    video.load();
+    fw.currentTime = 0;
+    boom.currentTime = 0;
+
+    video.style.display = "block";
+
+    video.play();
+    fw.play();
+
+    setTimeout(() => {
+        boom.play();
+
+        if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+
+        document.body.style.animation = "screenShake 0.6s ease";
+        setTimeout(() => document.body.style.animation = "", 600);
+
+    }, 1200);
+}
+
+/* ------------------ INIT ------------------ */
+
 loadRanking();
-// TEST FUOCHI — DA RIMUOVERE DOPO
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("styleSelector").style.display = "none";
-    document.getElementById("gameArea").style.display = "block";
-
-    document.getElementById("results").innerHTML = `
-        <h2>Hai indovinato! 🎉</h2>
-        <div class="winGlow" style="margin-top:10px;">
-            <img src="fireworks_rookie.jpg" style="width:200px; border-radius:10px;">
-        </div>
-        <p style="opacity:0.7; margin-top:10px;"><strong>TEST FUOCHI — VERSIONE TEMPORANEA</strong></p>
-    `;
-});
-
 </script>
 
 </body>
