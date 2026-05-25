@@ -118,7 +118,7 @@
     <source id="fwSource" src="fireworks_rookie.mp4" type="video/mp4">
 </video>
 
-<!-- VIDEO MONKEY (OVERLAY CORRETTO) -->
+<!-- VIDEO MONKEY -->
 <video id="monkeyVideo" muted playsinline style="
     position:fixed;
     top:50%;
@@ -341,7 +341,6 @@ function startGame() {
 
     generateSecret();
 }
-
 /* ------------------ INVIO ------------------ */
 
 function sendBoxes() {
@@ -496,10 +495,8 @@ function resetGame() {
     document.getElementById("styleSelector").style.display = "block";
     document.getElementById("results").innerHTML = "";
 }
-
 /* ------------------ FUOCHI + BOOM + MONKEY ------------------ */
 
-const video = document.getElementById("fireworksVideo
 const video = document.getElementById("fireworksVideo");
 const fw = document.getElementById("fwAudio");
 const boom = document.getElementById("boomAudio");
@@ -559,6 +556,7 @@ function startMonkey() {
 /* ------------------ INIT ------------------ */
 
 loadRanking();
+
 </script>
 
 </body>
