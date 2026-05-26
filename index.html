@@ -78,6 +78,114 @@
       80% { transform: translate(4px, -4px); }
       100% { transform: translate(0, 0); }
     }
+/* === CLASSIFICA ARCADE ULTRA === */
+
+.arcade-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    animation: fadeInArcade 0.3s ease forwards;
+}
+
+@keyframes fadeInArcade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.arcade-box {
+    background: #140024;
+    border: 3px solid #7f00ff;
+    padding: 22px;
+    width: 90%;
+    max-width: 480px;
+    border-radius: 14px;
+    box-shadow: 0 0 22px #7f00ff;
+    animation: popArcade 0.3s ease forwards;
+}
+
+@keyframes popArcade {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.arcade-title {
+    font-size: 24px;
+    color: #ffea00;
+    text-shadow: 0 0 8px #ffea00;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.arcade-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 16px;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    opacity: 0;
+    transform: translateY(-12px);
+    animation: slideRow 0.4s ease forwards;
+}
+
+@keyframes slideRow {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.arcade-medal {
+    font-size: 20px;
+    margin-right: 6px;
+}
+
+.medal-gold {
+    color: #ffd700;
+    animation: pulseGold 1.4s infinite;
+}
+
+@keyframes pulseGold {
+    0% { text-shadow: 0 0 4px #ffd700; }
+    50% { text-shadow: 0 0 14px #ffd700; }
+    100% { text-shadow: 0 0 4px #ffd700; }
+}
+
+.medal-silver {
+    color: #c0c0c0;
+    text-shadow: 0 0 8px #c0c0c0;
+}
+
+.medal-bronze {
+    color: #cd7f32;
+    animation: bounceBronze 1.1s infinite;
+}
+
+@keyframes bounceBronze {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+.arcade-close {
+    margin-top: 16px;
+    padding: 8px 18px;
+    background: #ffea00;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-shadow: 0 0 4px #ffea00;
+}
+
 </style>
 </head>
 <body>
@@ -457,6 +565,55 @@ function checkGuess(guess) {
 
         return;
     }
+/* === SALVATAGGIO PUNTEGGI CLASSIFICA ULTRA === */
+
+function saveArcadeScore(name, attempts, level) {
+    let scores = JSON.parse(localStorage.getItem("arcade_scores") || "[]");
+
+    scores.push({
+        name,
+        attempts,
+        level,
+        timestamp: Date.now()
+    });
+
+    localStorage.setItem("arcade_scores", JSON.stringify(scores));
+}
+/* === APERTURA CLASSIFICA ARCADE === */
+function openArcadeRanking() {
+    let scores = JSON.parse(localStorage.getItem("arcade_scores") || "[]");
+
+    // Ordina per tentativi (meno è meglio)
+    scores.sort((a, b) => a.attempts - b.attempts);
+
+    // Prendi solo i primi 10
+    scores = scores.slice(0, 10);
+
+    let html = "";
+
+    scores.forEach((s, i) => {
+        let medal = "";
+        if (i === 0) medal = `<span class="arcade-medal medal-gold">🥇</span>`;
+        else if (i === 1) medal = `<span class="arcade-medal medal-silver">🥈</span>`;
+        else if (i === 2) medal = `<span class="arcade-medal medal-bronze">🥉</span>`;
+
+        html += `
+            <div class="arcade-row" style="animation-delay:${i * 0.08}s">
+                <div>${medal}${i + 1}. ${s.name}</div>
+                <div>${s.attempts} tentativi</div>
+                <div>${s.level}</div>
+            </div>
+        `;
+    });
+
+    document.getElementById("arcadeRankingContent").innerHTML = html;
+    document.getElementById("arcadeRankingOverlay").style.display = "flex";
+}
+
+/* === CHIUSURA CLASSIFICA === */
+function closeArcadeRanking() {
+    document.getElementById("arcadeRankingOverlay").style.display = "none";
+}
 
     /* ------------------ SCONFITTA (CORRETTA) ------------------ */
 
@@ -558,6 +715,15 @@ function startMonkey() {
 loadRanking();
 
 </script>
+
+<!-- CLASSIFICA ARCADE ULTRA -->
+<div id="arcadeRankingOverlay" class="arcade-overlay">
+    <div class="arcade-box">
+        <h2 class="arcade-title">🏆 CLASSIFICA ARCADE 🏆</h2>
+        <div id="arcadeRankingContent"></div>
+        <button class="arcade-close" onclick="closeArcadeRanking()">Chiudi</button>
+    </div>
+</div>
 
 </body>
 </html>
